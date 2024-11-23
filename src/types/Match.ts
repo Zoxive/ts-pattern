@@ -193,16 +193,9 @@ export type Match<
    * */
   exhaustive: DeepExcludeAll<i, handledCases> extends infer remainingCases
     ? [remainingCases] extends [never]
-      ? () => PickReturnValue<o, inferredOutput>
+      ? (handler: () => PickReturnValue<o, inferredOutput>) => PickReturnValue<o, inferredOutput>
       : NonExhaustiveError<remainingCases>
     : never;
-
-  /**
-   * `.run()` return the resulting value.
-   *
-   * ⚠️ calling this function is unsafe, and may throw if no pattern matches your input.
-   * */
-  run(): PickReturnValue<o, inferredOutput>;
 
   /**
    * `.returnType<T>()` Lets you specify the return type for all of your branches.

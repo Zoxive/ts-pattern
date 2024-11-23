@@ -1,8 +1,7 @@
 import { Pattern } from './types/Pattern';
-import { Match } from './types/Match';
 import * as symbols from './internals/symbols';
 import { matchPattern } from './internals/helpers';
-import { NonExhaustiveError } from './errors';
+import { Match } from './types/Match';
 
 type MatchState<output> =
   | { matched: true; value: output }
@@ -32,7 +31,7 @@ const unmatched: MatchState<never> = {
 export function match<const input, output = symbols.unset>(
   value: input
 ): Match<input, output> {
-  return new MatchExpression(value, unmatched) as any;
+  return new MatchExpression<input, output>(value, unmatched) as unknown as Match<input, output>;
 }
 
 /**
@@ -112,14 +111,10 @@ class MatchExpression<input, output> {
     return handler(this.input);
   }
 
-  exhaustive(): output {
+  exhaustive(handler: () => output): output {
     if (this.state.matched) return this.state.value;
 
-    throw new NonExhaustiveError(this.input);
-  }
-
-  run(): output {
-    return this.exhaustive();
+    return handler();
   }
 
   returnType() {
